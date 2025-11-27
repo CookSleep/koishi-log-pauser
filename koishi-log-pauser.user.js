@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Koishi 日志滚动控制
 // @namespace    https://github.com/CookSleep
-// @version      1.0
+// @version      1.1
 // @description  控制 Koishi 控制台日志滚动
 // @author       Cook Sleep
 // @match        http://localhost:5140/logs*
 // @icon         https://koishi.chat/logo.png
+// @grant        GM_addStyle
 // @license      GPLv3
 // @downloadURL  https://github.com/CookSleep/koishi-log-pauser/raw/main/koishi-log-pauser.user.js
 // @updateURL    https://github.com/CookSleep/koishi-log-pauser/raw/main/koishi-log-pauser.user.js
@@ -18,7 +19,10 @@
     const SELECTORS = {
         SCROLL_WRAP: '.el-scrollbar__wrap',
         HEADER: '.layout-header',
+        TITLE: '.layout-header .left' // 定位标题区域
     };
+
+    const TARGET_TITLE = '日志'; // 目标标题文本
 
     // 提取 Koishi 风格的 CSS 变量和样式
     const STYLES = `
@@ -31,12 +35,10 @@
             padding: 0 12px;
             margin-left: auto;
             margin-right: 16px;
-
             /* 字体 */
             font-size: 13px;
             font-weight: 500;
             white-space: nowrap;
-
             /* 默认外观 (暗色模式/默认) */
             background-color: transparent;
             border: 1px solid var(--k-border, #4c4c4c);
@@ -46,6 +48,7 @@
             transition: all 0.2s ease;
             user-select: none;
             box-sizing: border-box;
+            z-index: 1000;
         }
 
         /* 悬停效果 */
@@ -103,33 +106,49 @@
     let toggleBtn = null;
     let currentScrollTop = 0;
     let originalScrollTopDescriptor = null;
+    let initTimer = null;
 
     // ================= 核心逻辑 =================
-    function init() {
+    function injectStyles() {
+        if (document.getElementById('koishi-log-style')) return;
         if (typeof GM_addStyle !== 'undefined') {
             GM_addStyle(STYLES);
         } else {
             const style = document.createElement('style');
+            style.id = 'koishi-log-style';
             style.textContent = STYLES;
             document.head.appendChild(style);
         }
+    }
 
-        const checkTimer = setInterval(() => {
+    function init() {
+        // 防止重复运行定时器
+        if (initTimer) clearInterval(initTimer);
+
+        injectStyles();
+
+        initTimer = setInterval(() => {
             const header = document.querySelector(SELECTORS.HEADER);
+            const titleEl = document.querySelector(SELECTORS.TITLE);
             scrollWrap = document.querySelector(SELECTORS.SCROLL_WRAP);
 
-            if (header && scrollWrap) {
-                clearInterval(checkTimer);
+            // 核心检测逻辑：Header存在 + 滚动容器存在 + 标题文字是“日志”
+            const isLogPage = titleEl && titleEl.textContent.trim() === TARGET_TITLE;
+
+            if (header && scrollWrap && isLogPage) {
+                // 只有当按钮不存在时才创建
                 if (!document.getElementById('koishi-log-toggle-btn')) {
+                    clearInterval(initTimer); // 找到了就停止轮询
                     createButton(header);
                     hijackScrollProperty();
 
+                    // 监听手动滚动，用于暂停时记录位置
                     scrollWrap.addEventListener('scroll', (e) => {
                         if (!isTracking) {
-                            // 暂停时记录用户手动滚动的位置，防止跳变
                             currentScrollTop = scrollWrap.scrollTop;
                         }
                     });
+                    console.log('[Koishi Log Pauser] 注入成功');
                 }
             }
         }, 500);
@@ -139,12 +158,13 @@
         toggleBtn = document.createElement('div');
         toggleBtn.id = 'koishi-log-toggle-btn';
         updateButtonState();
-
         toggleBtn.onclick = toggleState;
 
         // 确保 header 布局能容纳按钮
         header.style.display = 'flex';
         header.style.alignItems = 'center';
+
+        // 插入到 header 中
         header.appendChild(toggleBtn);
     }
 
@@ -175,6 +195,9 @@
         if (!scrollWrap) return;
 
         const proto = Element.prototype;
+        // 如果已经劫持过，就不再重复劫持，防止死循环或报错
+        if (scrollWrap.hasOwnProperty('scrollTop')) return;
+
         originalScrollTopDescriptor = Object.getOwnPropertyDescriptor(proto, 'scrollTop');
 
         if (!originalScrollTopDescriptor || !originalScrollTopDescriptor.set) return;
@@ -196,19 +219,36 @@
         });
     }
 
-    // ================= 启动 =================
+    // ================= 启动与路由监听 =================
+    // 初始运行
     init();
 
     // 路由变化监听 (SPA 适配)
     let lastUrl = location.href;
-    new MutationObserver(() => {
+
+    const observer = new MutationObserver(() => {
         const url = location.href;
         if (url !== lastUrl) {
             lastUrl = url;
-            if (url.includes('/logs')) {
+            // URL 变了，重新尝试初始化，因为 DOM 可能被重绘了
+            // 依靠 init 内部的“日志”文字判断
+            init();
+        } else {
+            // 即使 URL 没变，如果 DOM 变动导致按钮丢失（例如组件重载），也需要检查
+            // 这里做一个轻量检查，如果我们在日志页但按钮没了，就重新 init
+            const titleEl = document.querySelector(SELECTORS.TITLE);
+            const isLogPage = titleEl && titleEl.textContent.trim() === TARGET_TITLE;
+            const btn = document.getElementById('koishi-log-toggle-btn');
+
+            if (isLogPage && !btn) {
                 init();
             }
         }
-    }).observe(document, {subtree: true, childList: true});
+    });
+
+    observer.observe(document.body, {
+        subtree: true,
+        childList: true
+    });
 
 })();
