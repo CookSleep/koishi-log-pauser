@@ -2,7 +2,7 @@
 // @name         Koishi 控制台日志增强
 // @namespace    https://github.com/CookSleep
 // @version      1.2
-// @description  控制 Koishi 控制台日志滚动 + 一键复制日志全文/内容
+// @description  控制 Koishi 控制台日志滚动 + 一键复制日志正文内容/原始文本
 // @author       Cook Sleep
 // @match        http://localhost:5140/logs*
 // @icon         https://koishi.chat/logo.png
@@ -121,7 +121,7 @@
             justify-content: center;
             width: 34px;
             height: 34px;
-            background-color: var(--k-btn-bg);
+            background-color: rgba(30, 30, 35, 0.85);
             border: 1px solid var(--k-btn-border);
             border-radius: var(--k-btn-radius);
             color: var(--k-btn-text);
@@ -132,14 +132,14 @@
         .koishi-btn:hover {
             border-color: var(--k-btn-hover-border);
             color: var(--k-btn-hover-text);
-            background-color: var(--k-btn-hover-bg);
+            background-color: rgba(116, 89, 255, 0.25);
             transform: translateY(-1px);
         }
 
         .koishi-btn.success {
             color: #67C23A !important;
             border-color: #67C23A !important;
-            background-color: rgba(103, 194, 58, 0.1) !important;
+            background-color: rgba(30, 80, 30, 0.9) !important;
         }
 
         .koishi-btn::after {
