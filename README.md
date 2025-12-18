@@ -1,8 +1,8 @@
 # Koishi 控制台日志增强
 
-![Version](https://img.shields.io/badge/version-1.2-blue) ![License](https://img.shields.io/badge/license-GPLv3-brightgreen)
+![Version](https://img.shields.io/badge/version-1.3-blue) ![License](https://img.shields.io/badge/license-GPLv3-brightgreen)
 
-为 Koishi 控制台 (Console) 的日志界面添加 **滚动控制** 和 **一键复制** 功能，大幅提升调试体验。
+为 Koishi 控制台 (Console) 的日志界面添加 **滚动控制**、**一键复制** 和 **多控制台支持** 功能，大幅提升调试体验。
 
 ## ✨ 功能特性
 
@@ -19,6 +19,12 @@
   - **`All`**：复制该行的完整原始文本。
 - **视觉反馈**：复制成功后按钮会变色提示。
 
+### 3. ⚙️ 多控制台支持
+- **自定义 URL**：支持配置多个 Koishi 控制台地址，适用于本地、服务器或自定义域名。
+- **篡改猴菜单设置**：通过篡改猴扩展菜单打开设置弹窗，随时修改控制台地址。
+- **智能匹配**：自动识别当前页面是否为已配置的 Koishi 控制台，仅在匹配时激活功能。
+- **URL 自动处理**：自动移除输入 URL 的路径部分和末尾斜杠。
+
 ## 📸 效果预览
 
 ### 滚动控制
@@ -31,7 +37,7 @@
 
 <img width="450" height="60" alt="image" src="https://github.com/user-attachments/assets/f2e4faa3-6e2a-4681-94a2-e20614949522" />
 
-### 一键复制
+## 一键复制
 
 <img width="410" height="130" alt="image" src="https://github.com/user-attachments/assets/f1195b61-c973-431a-b94d-1ef6eb2ba06e" />
 
@@ -57,23 +63,24 @@ Detected GIF image, which is not supported by most models. Please install chatlu
 
 2. 点击下方链接直接安装脚本：
    
-   👉 **[点击安装 Koishi Console Log Enhanced](https://github.com/CookSleep/koishi-log-enhanced/raw/main/koishi-log-enhanced.user.js)** 
+   👉 **[点击安装 Koishi Console Log Enhanced](https://github.com/CookSleep/koishi-log-enhanced/raw/main/koishi-log-enhanced.user.js)**
 
-3. 打开你的 Koishi 控制台日志页面，功能将自动生效。
+3. **参考下方“设置说明”**，完成设置
 
-## 🛠️ 匹配设置
+4. 打开/刷新你的 Koishi 控制台日志页面，功能将自动生效。
 
-脚本默认匹配了 Koishi 的常用本地端口 `5140`。如果你在服务器或自定义域名上使用，请在 Tampermonkey 编辑器中修改脚本头部的 `@match` 规则：
+## 🛠️ 设置说明
 
-```javascript
-// @match        http://localhost:5140/logs*
-// @match        https://your-domain.com/logs*
-```
+脚本默认使用 `http://127.0.0.1:5140` 作为 Koishi 控制台地址，若默认地址与你使用的不同，请参考下方内容进行修改。
 
-## 📝 原理说明
+**配置方式：**
+1. 点击浏览器工具栏中的篡改猴图标，选择「⚙️ 设置控制台地址」打开设置弹窗进行修改。
+2. 支持添加多个控制台地址，适用于同时管理多个 Koishi 实例。
+3. 留空保存则使用默认值 `http://127.0.0.1:5140`。
 
-- **滚动劫持**：通过 `Object.defineProperty` 劫持滚动容器的 `scrollTop` 属性，在暂停状态下拦截 Koishi 前端的自动滚动指令。
-- **样式注入**：自动识别暗色/亮色模式，注入 CSS 变量以适配 Koishi 控制台的主题风格。
+**注意事项：**
+- 输入完整的控制台地址（如 `https://koishi.example.com`），脚本会自动移除路径部分。
+- 删除地址时需要点击两次确认，防止误删。
 
 ## 🤝 贡献
 
