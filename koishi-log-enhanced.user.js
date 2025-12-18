@@ -8,8 +8,8 @@
 // @icon         https://koishi.chat/logo.png
 // @grant        GM_addStyle
 // @license      GPLv3
-// @downloadURL  https://github.com/CookSleep/koishi-log-pauser/raw/main/koishi-log-pauser.user.js
-// @updateURL    https://github.com/CookSleep/koishi-log-pauser/raw/main/koishi-log-pauser.user.js
+// @downloadURL  https://github.com/CookSleep/koishi-log-enhanced/raw/main/koishi-log-enhanced.user.js
+// @updateURL    https://github.com/CookSleep/koishi-log-enhanced/raw/main/koishi-log-enhanced.user.js
 // ==/UserScript==
 
 (function() {
