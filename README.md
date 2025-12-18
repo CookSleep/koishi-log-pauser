@@ -57,7 +57,7 @@ Detected GIF image, which is not supported by most models. Please install chatlu
 
 2. 点击下方链接直接安装脚本：
    
-   👉 **[点击安装 Koishi Console Log Enhanced](https://github.com/CookSleep/koishi-log-pauser/raw/main/koishi-log-pauser.user.js)** 
+   👉 **[点击安装 Koishi Console Log Enhanced](https://github.com/CookSleep/koishi-log-enhanced/raw/main/koishi-log-enhanced.user.js)** 
 
 3. 打开你的 Koishi 控制台日志页面，功能将自动生效。
 
